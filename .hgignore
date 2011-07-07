@@ -1,0 +1,6 @@
+syntax: glob
+.project
+.pydevproject
+*.pyc
+.tox
+Flask_Scss.egg-info
