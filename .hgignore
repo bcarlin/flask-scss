@@ -8,3 +8,5 @@ doc/.build
 flake8.txt
 .settings
 doc/.themes/.git
+MANIFEST
+dist
