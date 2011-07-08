@@ -16,7 +16,7 @@ setup(
     author_email='self@aerdhyl.eu',
     description='This extension brings support for scss files to Flask',
     long_description=open('README.txt').read(),
-    packages=['flaskext'],
+    packages=['flaskext', 'flaskext.test'],
     namespace_packages=['flaskext'],
     zip_safe=False,
     platforms='any',

@@ -1,15 +1,14 @@
-'''
-Created on 7 juil. 2011
-
-@author: bubu
-'''
-import unittest
+from __future__ import with_statement
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 import os
 import os.path as op
 import shutil
 from mock import Mock
 from flask import Flask
-import flaskext
+import flaskext.flask_scss
 import time
 
 SCSS_CONTENT = "a { color: red; text-decoration: none; }"
@@ -154,7 +153,7 @@ class ScssTest(unittest.TestCase):
         css_path = self.create_static_file('foo.css')
         scss_path = self.create_asset_file('foo.scss')
         os.utime(css_path, (time.time()-10, time.time()-10))
-        os.utime(scss_path, None)
+        os.utime(scss_path, (time.time()-5, time.time()-5))
         scss = flaskext.flask_scss.Scss(self.app)
         # check that the css file is older than the scss file
         self.assertGreater(op.getmtime(scss_path), op.getmtime(css_path))
@@ -170,7 +169,7 @@ class ScssTest(unittest.TestCase):
         css_path = self.create_static_file('foo.css')
         scss_path = self.create_asset_file('foo.scss')
         os.utime(scss_path, (time.time()-10, time.time()-10))
-        os.utime(css_path, None)
+        os.utime(css_path, (time.time()-5, time.time()-5))
         scss = flaskext.flask_scss.Scss(self.app)
         # check that the css file is newer than the scss file
         self.assertGreater(op.getmtime(css_path), op.getmtime(scss_path))

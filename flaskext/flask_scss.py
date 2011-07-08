@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import os.path as op
 import os
 import scss
@@ -64,9 +65,9 @@ class Scss(object):
                 self.compile_scss(asset)
     
     def compile_scss(self, asset):
-        self.app.logger.info("[flask-pyscss] refreshing {}".format(asset['dest_path']))
-        with open(asset['dest_path'], 'w') as fo, \
-             open(asset['src_path']) as fi:
-            fo.write(self.compiler(fi.read()))
+        self.app.logger.info("[flask-pyscss] refreshing %s" % (asset['dest_path'],))
+        with open(asset['dest_path'], 'w') as fo:
+            with open(asset['src_path']) as fi:
+                fo.write(self.compiler(fi.read()))
     
     
