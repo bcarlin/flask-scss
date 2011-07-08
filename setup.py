@@ -1,8 +1,20 @@
 """
 Flask-scss
--------------
+----------
 
-This extension brings support for scss files to Flask
+
+This extension brings support for scss files to Flask. It uses `pyScss`_
+compiler for scss files.
+
+Links
+`````
+
+* `documentation <http://packages.python.org/Flask-Scss>`_
+* `development version
+  <https://bitbucket.org/aerdhyl/flask-scss#egg=Flask-Scss-dev>`_
+
+.. _pyScss: http://pypi.python.org/pypi/pyScss
+
 """
 from setuptools import setup
 
@@ -14,8 +26,8 @@ setup(
     license='MIT',
     author='Bruno Carlin',
     author_email='self@aerdhyl.eu',
-    description='This extension brings support for scss files to Flask',
-    long_description=open('README.txt').read(),
+    description='Adds support for scss files to Flask applications',
+    long_description=__doc__,
     packages=['flaskext', 'flaskext.test'],
     namespace_packages=['flaskext'],
     zip_safe=False,

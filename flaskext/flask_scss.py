@@ -5,7 +5,27 @@ import scss
 
 
 class Scss(object):
+    '''
+    Main and only class for Flask-Scss. It is in charge on the discovery of
+    .scss files and compiles them every time they are modified.
+    
+    Any application that wants to use Flask-Scss must create a instance of this class
+    '''
+    
     def __init__(self, app, static_dir=None, asset_dir=None):
+        '''
+        
+        See :ref:`scss_discovery_rules` 
+        and :ref:`static_discovery_rules`
+        for more information about the impact of ``static_dir`` and  
+        ``asset_dir`` parameters.
+        
+        :param app: Your Flask Application
+        :param static_dir: The path to the ``static`` directory of your 
+                           application (optionnal)
+        :param asset_dir: The path to the ``assets`` directory where Flask-Scss
+                          will search ``.scss`` files (optionnal)
+        '''
         self.app = app
         self.asset_dir = self.set_asset_dir(asset_dir)
         self.static_dir = self.set_static_dir(static_dir)

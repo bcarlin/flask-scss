@@ -4,6 +4,7 @@ syntax: glob
 *.pyc
 .tox
 Flask_Scss.egg-info
-
-syntax: regexp
-^flake8\.txt$
+doc/.build
+flake8.txt
+.settings
+doc/.themes/.git
