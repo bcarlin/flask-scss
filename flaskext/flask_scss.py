@@ -4,22 +4,26 @@ import scss
 
 
 class Scss(object):
-    def __init__(self, app):
+    def __init__(self, app, static_dir=None, asset_dir=None):
         self.app = app
-        self.asset_dir = self.set_asset_dir()
-        self.static_dir = self.set_static_dir()
+        self.asset_dir = self.set_asset_dir(asset_dir)
+        self.static_dir = self.set_static_dir(static_dir)
         self.assets = {}
         self.compiler = scss.Scss().compile
         self.set_hooks()
         
-    def set_asset_dir(self):
-        asset_dir = op.join(self.app.root_path, 'assets', 'scss')
+    def set_asset_dir(self, asset_dir):
+        asset_dir = asset_dir if asset_dir is not None \
+                        else op.join(self.app.root_path, 'assets')
+        if op.exists(op.join(asset_dir, 'scss')):
+            return op.join(asset_dir, 'scss')
         if op.exists(asset_dir):
             return asset_dir
         return None
     
-    def set_static_dir(self):
-        static_dir = op.join(self.app.root_path, self.app.static_folder)
+    def set_static_dir(self, static_dir):
+        static_dir = static_dir if static_dir is not None \
+                       else op.join(self.app.root_path, self.app.static_folder)
         if op.exists(op.join(static_dir, 'css')):
             return op.join(static_dir, 'css')
         if op.exists(static_dir):
@@ -29,7 +33,11 @@ class Scss(object):
     def set_hooks(self):
         if self.asset_dir is None:
             self.app.logger.warning("The asset directory cannot be found."
-                                    "PyScss extension has been disabled")
+                                    "Flask-Scss extension has been disabled")
+            return
+        if self.static_dir is None:
+            self.app.logger.warning("The static directory cannot be found."
+                                    "Flask-Scss extension has been disabled")
             return
         self.app.logger.info("Pyscss loaded!")
         self.app.before_request(self.update_scss)
