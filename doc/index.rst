@@ -18,6 +18,8 @@ It is far from perfect or complete. Current features are the following:
 - Automatic compilation of .scss files
 - Automatic refreshing of resulting .css files when .scss sources have changed
   (only if ``app.testing`` or ``app.debug`` are True)
+- Configuration variables can be either set on the app config or given as an 
+  option
 
 Scss files compilation is done by the 
 `pyScss <http://pypi.python.org/pypi/pyScss>`_ implementation by 
@@ -81,6 +83,27 @@ will expect the following layout::
       scss/
     ...other files...
 
+Configuration options
+~~~~~~~~~~~~~~~~~~~~~
+
+The following parameters are looked for first in the arguments given to the
+:class:`Scss` class. if they are not found, they will be searched in the
+application configuration (app.config).
+
++------------+-----------------+----------------------------------------------+
+| static_dir | SCSS_STATIC_DIR | The path to the ``static`` directory of your |
+|            |                 | application                                  |
++------------+-----------------+----------------------------------------------+
+| asset_dir  | SCSS_ASSET_DIR  | The path to the ``assets`` directory where   |
+|            |                 | Flask-Scss will search ``.scss`` files       |
++------------+-----------------+----------------------------------------------+
+| load_paths | SCSS_LOAD_PATHS | A list of folders to add to pyScss load_paths|
+|            |                 | (for ex., the path to a library like Compass)|
++------------+-----------------+----------------------------------------------+
+
+
+
+
 .. _scss_discovery_rules: 
 
 ``.scss`` files discovery rules
@@ -91,14 +114,19 @@ The ``asset`` directory will be selecting according to the following rules:
 
 1. If ``asset_dir`` option is given to the class Scss:
 
-   1.1. ``{asset_dir}/scss`` if this folder exists
-   1.2. ``{asset_dir}`` if this folder exists
+   1. ``{asset_dir}/scss`` if this folder exists
+   2. ``{asset_dir}`` if this folder exists
 
-2. If ``asset_dir`` option is NOT given to the class Scss (``app`` is your Flask 
-   based application):
+2. If ``app.config['SCSS_ASSET_DIR']`` option is is set on the application:
 
-   2.1. ``{app.root_dir}/assets/scss`` if this folder exists
-   2.2. ``{app.root_dir}/assets`` if this folder exists
+   1. ``{app.config['SCSS_ASSET_DIR']}/scss`` if this folder exists
+   2. ``{app.config['SCSS_ASSET_DIR']}`` if this folder exists
+
+3. If ``asset_dir`` option is NOT given to the class Scss and 
+   ``app.config['SCSS_ASSET_DIR']`` is not set:
+
+   1. ``{app.root_dir}/assets/scss`` if this folder exists
+   2. ``{app.root_dir}/assets`` if this folder exists
 
 If no asset directory is found, Flask-Scss will not be activated.
 
@@ -118,7 +146,13 @@ the following rules:
    1. ``{static_dir}``/css if this folder exists
    2. ``{static_dir}`` if this folder exists
 
-2. If ``static_dir`` option is NOT given to the class Scss, Flask-Scss will
+2. If ``app.config['SCSS_STATIC_DIR']`` option is is set on the application:
+
+   1. ``{app.config['SCSS_STATIC_DIR']}/css`` if this folder exists
+   2. ``{app.config['SCSS_STATIC_DIR']}`` if this folder exists
+
+3. If ``asset_dir`` option is NOT given to the class Scss and 
+   ``app.config['SCSS_ASSET_DIR']`` is not set, Flask-Scss will
    build a "default" path from ``app.root_path`` and ``app.static_path``
    (``app`` is your Flask based application). following paths will then be
    tried:
@@ -127,6 +161,28 @@ the following rules:
    2. ``{default_static_dir}`` if this folder exists
 
 If no static directory is found, Flask-Scss will not be activated.
+
+
+Scss libraries search path
+--------------------------
+
+Scss frameworks like Compass heavily use ``@import`` directives.
+
+You can specify the search path for such libraries by passing an extra argument
+to :class:`Scss` ::
+  
+  Scss(app, load_paths=[
+    '/Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/'
+  ])
+
+or by setting an option in your app config::
+
+  app.config['SCSS_LOAD_PATHS'] = [
+    '/Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/'
+  ]
+
+.. warning::
+   Because of the way pyScss works, search is not done recursively in the given path.
 
 APIs
 ----

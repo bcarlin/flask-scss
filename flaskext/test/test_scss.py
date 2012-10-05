@@ -21,6 +21,7 @@ class ScssTest(unittest.TestCase):
         os.makedirs(self.test_data)
         self.app = Mock()
         self.app.root_path = self.test_data
+        self.app.config = {'SCSS_LOAD_PATHS': []}
         self.app.static_folder = op.join(self.test_data, 'static')
 
     def tearDown(self):
@@ -74,6 +75,22 @@ class ScssTest(unittest.TestCase):
                                                           'assets2'))
         self.assertEqual(scss.asset_dir, asset_scss_dir)
 
+    def test_set_asset_dir_from_app_conf(self):
+        asset_scss_dir = op.join(self.test_data, 'assets', 'bar')
+        self.app.config['SCSS_ASSET_DIR'] = asset_scss_dir
+        os.makedirs(asset_scss_dir)
+        scss = flaskext.flask_scss.Scss(self.app)
+        self.assertEqual(scss.asset_dir, asset_scss_dir)
+
+    def test_local_asset_dir_must_override_app_conf(self):
+        asset_scss_dir = op.join(self.test_data, 'assets', 'bar')
+        asset_scss_dir2 = op.join(self.test_data, 'assets2', 'bar')
+        self.app.config['SCSS_ASSET_DIR'] = asset_scss_dir
+        os.makedirs(asset_scss_dir)
+        os.makedirs(asset_scss_dir2)
+        scss = flaskext.flask_scss.Scss(self.app, asset_dir=asset_scss_dir2)
+        self.assertEqual(scss.asset_dir, asset_scss_dir2)
+
     def test_set_static_dir_static_css(self):
         static_css_dir = op.join(self.test_data, 'static', 'css')
         os.makedirs(static_css_dir)
@@ -97,6 +114,22 @@ class ScssTest(unittest.TestCase):
                                         static_dir=op.join(self.test_data,
                                                           'static2'))
         self.assertEqual(scss.static_dir, static_css_dir)
+
+    def test_set_static_dir_from_app_conf(self):
+        static_scss_dir = op.join(self.test_data, 'static', 'bar')
+        self.app.config['SCSS_STATIC_DIR'] = static_scss_dir
+        os.makedirs(static_scss_dir)
+        scss = flaskext.flask_scss.Scss(self.app)
+        self.assertEqual(scss.static_dir, static_scss_dir)
+
+    def test_local_static_dir_must_override_app_conf(self):
+        static_scss_dir = op.join(self.test_data, 'static', 'bar')
+        static_scss_dir2 = op.join(self.test_data, 'static2', 'bar')
+        self.app.config['SCSS_STATIC_DIR'] = static_scss_dir
+        os.makedirs(static_scss_dir)
+        os.makedirs(static_scss_dir2)
+        scss = flaskext.flask_scss.Scss(self.app, static_dir=static_scss_dir2)
+        self.assertEqual(scss.static_dir, static_scss_dir2)
 
     def test_set_hooks_no_static_dir(self):
         asset_dir = op.join(self.test_data, 'assets')
@@ -197,29 +230,56 @@ class ScssTest(unittest.TestCase):
         self.app.testing = True
         self.app.debug = False
         with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
-            inst = flaskext.flask_scss.Scss(self.app)
+            flaskext.flask_scss.Scss(self.app)
             self.assertTrue(mock_set_hooks.called)
 
     def test_it_sets_up_refresh_hooks_if_application_is_in_debug_mode(self):
         self.app.testing = False
         self.app.debug = True
         with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
-            inst = flaskext.flask_scss.Scss(self.app)
+            flaskext.flask_scss.Scss(self.app)
             self.assertTrue(mock_set_hooks.called)
 
     def test_it_sets_up_refresh_hooks_if_application_is_in_debug_and_testing_mode(self):
         self.app.testing = True
         self.app.debug = True
         with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
-            inst = flaskext.flask_scss.Scss(self.app)
+            flaskext.flask_scss.Scss(self.app)
             self.assertTrue(mock_set_hooks.called)
 
     def test_it_does_not_set_up_refresh_hooks_if_application_is_not_in_debug_or_testing_mode(self):
         self.app.testing = False
         self.app.debug = False
         with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
-            inst = flaskext.flask_scss.Scss(self.app)
+            flaskext.flask_scss.Scss(self.app)
             self.assertFalse(mock_set_hooks.called)
+
+    def test_it_looks_for_an_app_load_path_settings(self):
+        self.app.config['SCSS_LOAD_PATHS'].append('foo')
+        flaskext.flask_scss.Scss(self.app)
+        self.assertIn('foo', flaskext.flask_scss.scss.LOAD_PATHS)
+
+    def test_it_looks_for_an_app_load_path_settings_with_multiple_paths(self):
+        self.app.config['SCSS_LOAD_PATHS'].append('foo')
+        self.app.config['SCSS_LOAD_PATHS'].append('bar')
+        flaskext.flask_scss.Scss(self.app)
+        self.assertIn('foo', flaskext.flask_scss.scss.LOAD_PATHS)
+        self.assertIn('bar', flaskext.flask_scss.scss.LOAD_PATHS)
+
+    def test_app_config_is_overridden_by_local_conf(self):
+        self.app.config['SCSS_LOAD_PATHS'].append('foo')
+        flaskext.flask_scss.Scss(self.app, load_paths=['bar'])
+        self.assertIn('bar', flaskext.flask_scss.scss.LOAD_PATHS)
+
+    def test_app_config_is_overridden_by_local_conf_with_multiple_paths(self):
+        self.app.config['SCSS_LOAD_PATHS'].append('foo')
+        flaskext.flask_scss.Scss(self.app, load_paths=['bar', 'baz'])
+        self.assertIn('bar', flaskext.flask_scss.scss.LOAD_PATHS)
+        self.assertIn('baz', flaskext.flask_scss.scss.LOAD_PATHS)
+
+    def test_the_asset_dir_is_in_the_load_path(self):
+        inst = flaskext.flask_scss.Scss(self.app, load_paths=['bar', 'baz'])
+        self.assertIn(inst.asset_dir, flaskext.flask_scss.scss.LOAD_PATHS)
 
 
 if __name__ == "__main__":

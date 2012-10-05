@@ -12,7 +12,7 @@ class Scss(object):
     Any application that wants to use Flask-Scss must create a instance of this class
     '''
 
-    def __init__(self, app, static_dir=None, asset_dir=None):
+    def __init__(self, app, static_dir=None, asset_dir=None, load_paths=[]):
         '''
 
         See :ref:`scss_discovery_rules`
@@ -20,24 +20,38 @@ class Scss(object):
         for more information about the impact of ``static_dir`` and
         ``asset_dir`` parameters.
 
+        Parameters here has preedence over Parameters found in the application
+        config.
+
         :param app: Your Flask Application
         :param static_dir: The path to the ``static`` directory of your
                            application (optionnal)
         :param asset_dir: The path to the ``assets`` directory where Flask-Scss
                           will search ``.scss`` files (optionnal)
+        :param load_paths: A list of folders to add to pyScss load_paths
+                           (for ex., the path to a library like Compass)
         '''
         self.app = app
         self.asset_dir = self.set_asset_dir(asset_dir)
         self.static_dir = self.set_static_dir(static_dir)
         self.assets = {}
+
+        if hasattr(scss.LOAD_PATHS, 'split'):
+            scss.LOAD_PATHS = scss.LOAD_PATHS.split(',')
+        load_path_list = [self.asset_dir] \
+                       + (load_paths or app.config.get('SCSS_LOAD_PATHS', []))
+        for path in load_path_list:
+            scss.LOAD_PATHS.append(path)
+
         self.compiler = scss.Scss().compile
 
         if self.app.testing or self.app.debug:
             self.set_hooks()
 
     def set_asset_dir(self, asset_dir):
-        asset_dir = asset_dir if asset_dir is not None \
-                        else op.join(self.app.root_path, 'assets')
+        asset_dir = asset_dir \
+                    or self.app.config.get('SCSS_ASSET_DIR', None) \
+                    or op.join(self.app.root_path, 'assets')
         if op.exists(op.join(asset_dir, 'scss')):
             return op.join(asset_dir, 'scss')
         if op.exists(asset_dir):
@@ -45,8 +59,9 @@ class Scss(object):
         return None
 
     def set_static_dir(self, static_dir):
-        static_dir = static_dir if static_dir is not None \
-                       else op.join(self.app.root_path, self.app.static_folder)
+        static_dir = static_dir  \
+                        or self.app.config.get('SCSS_STATIC_DIR', None) \
+                        or op.join(self.app.root_path, self.app.static_folder)
         if op.exists(op.join(static_dir, 'css')):
             return op.join(static_dir, 'css')
         if op.exists(static_dir):
