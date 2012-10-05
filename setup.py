@@ -22,7 +22,7 @@ from distutils.core import setup
 setup(
     name='Flask-Scss',
     version='0.1',
-    url='https://bitbucket.org/aerdhyl/flask-scss',
+    url='https://github.com/bcarlin/flask-scss',
     license='MIT',
     author='Bruno Carlin',
     author_email='self@aerdhyl.eu',

@@ -20,6 +20,6 @@ Links
 
 * `documentation <http://packages.python.org/Flask-Scss>`_
 * `development version
-  <https://bitbucket.org/aerdhyl/flask-scss#egg=Flask-Scss-dev>`_
+  <https://github.com/bcarlin/flask-scss.git#egg=Flask-Scss-dev>`_
 
 .. _pyScss: http://pypi.python.org/pypi/pyScss
