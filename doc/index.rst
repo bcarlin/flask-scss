@@ -17,6 +17,7 @@ It is far from perfect or complete. Current features are the following:
 - Automatic discovery of .scss assets
 - Automatic compilation of .scss files
 - Automatic refreshing of resulting .css files when .scss sources have changed
+  (only if ``app.testing`` or ``app.debug`` are True)
 
 Scss files compilation is done by the 
 `pyScss <http://pypi.python.org/pypi/pyScss>`_ implementation by 
@@ -33,11 +34,11 @@ To install Flask-Scss, you can use ``pip``::
 
 You can also checkout the development version ::
 
-  hg clone https://aerdhyl@bitbucket.org/aerdhyl/flask-scss
+  git clone https://github.com/bcarlin/flask-scss.git
 
 or using ``pip``::
 
-  pip install hg+https://bitbucket.org/aerdhyl/flask-scss#egg=Flask-Scss-dev
+  pip install git+https://github.com/bcarlin/flask-scss.git#egg=Flask-Scss-dev
 
 
 Configuration
@@ -52,21 +53,10 @@ configuring the application::
   app = Flask(__name__)
   Scss(app)
 
-Flask-Scss will now check before each request wether a .scss file has been 
-modified. If so, it will refresh the corresponding .css file. To avoid the 
-overhead of CSS refreshing, you can limit live scss refreshing to the 
-development server::
-
-  from flask import Flask
-  from flaskext.flask_scss import Scss
-  
-  app = Flask(__name__)
-
-  # ... your code ...
-
-  if __name__ == '__main__':
-    Scss(app)
-    app.run()
+Flask-Scss will determine if it must refresh css files before each request by
+looking at your application configuration. If ``app.testing`` or ``app.debug``
+are True, it will refresh the .css file if the matching .scss file has been 
+modified.
 
 You will then have to generate css files yourself for other setups 
 (WSGI server, etc...)
@@ -125,16 +115,16 @@ the following rules:
 
 1. If ``static_dir`` option is given to the class Scss:
 
-   1.1. ``{static_dir}``/css if this folder exists
-   1.2. ``{static_dir}`` if this folder exists
+   1. ``{static_dir}``/css if this folder exists
+   2. ``{static_dir}`` if this folder exists
 
 2. If ``static_dir`` option is NOT given to the class Scss, Flask-Scss will
    build a "default" path from ``app.root_path`` and ``app.static_path``
    (``app`` is your Flask based application). following paths will then be
    tried:
 
-   2.1. ``{default_static_dir}/css`` if this folder exists
-   2.2. ``{default_static_dir}`` if this folder exists
+   1. ``{default_static_dir}/css`` if this folder exists
+   2. ``{default_static_dir}`` if this folder exists
 
 If no static directory is found, Flask-Scss will not be activated.
 

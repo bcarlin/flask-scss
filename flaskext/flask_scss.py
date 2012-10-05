@@ -31,7 +31,9 @@ class Scss(object):
         self.static_dir = self.set_static_dir(static_dir)
         self.assets = {}
         self.compiler = scss.Scss().compile
-        self.set_hooks()
+
+        if self.app.testing or self.app.debug:
+            self.set_hooks()
 
     def set_asset_dir(self, asset_dir):
         asset_dir = asset_dir if asset_dir is not None \

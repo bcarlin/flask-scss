@@ -6,7 +6,7 @@ except ImportError:
 import os
 import os.path as op
 import shutil
-from mock import Mock
+from mock import Mock, patch
 from flask import Flask
 import flaskext.flask_scss
 import time
@@ -192,6 +192,35 @@ class ScssTest(unittest.TestCase):
 
         css_newer_content = open(css_must_be_compiled_path).read()
         self.assertNotEquals(css_newer_content, "nothing")
+
+    def test_it_sets_up_refresh_hooks_if_application_is_in_test_mode(self):
+        self.app.testing = True
+        self.app.debug = False
+        with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
+            inst = flaskext.flask_scss.Scss(self.app)
+            self.assertTrue(mock_set_hooks.called)
+
+    def test_it_sets_up_refresh_hooks_if_application_is_in_debug_mode(self):
+        self.app.testing = False
+        self.app.debug = True
+        with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
+            inst = flaskext.flask_scss.Scss(self.app)
+            self.assertTrue(mock_set_hooks.called)
+
+    def test_it_sets_up_refresh_hooks_if_application_is_in_debug_and_testing_mode(self):
+        self.app.testing = True
+        self.app.debug = True
+        with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
+            inst = flaskext.flask_scss.Scss(self.app)
+            self.assertTrue(mock_set_hooks.called)
+
+    def test_it_does_not_set_up_refresh_hooks_if_application_is_not_in_debug_or_testing_mode(self):
+        self.app.testing = False
+        self.app.debug = False
+        with patch.object(flaskext.flask_scss.Scss, 'set_hooks') as mock_set_hooks:
+            inst = flaskext.flask_scss.Scss(self.app)
+            self.assertFalse(mock_set_hooks.called)
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
