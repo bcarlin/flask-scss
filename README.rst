@@ -1,5 +1,3 @@
-.. -*- restructuredtext -*-
-
 ==========
 Flask-Scss
 ==========
