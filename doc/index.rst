@@ -181,8 +181,6 @@ or by setting an option in your app config::
     '/Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/'
   ]
 
-.. warning::
-   Because of the way pyScss works, search is not done recursively in the given path.
 
 APIs
 ----
