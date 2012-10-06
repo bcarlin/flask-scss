@@ -86,7 +86,8 @@ class Scss(object):
         for folder, _, files in os.walk(self.asset_dir):
             for filename in fnmatch.filter(files, '*.scss'):
                 src_path = op.join(folder, filename)
-                if filename not in self.assets:
+                if not filename.startswith('_') \
+                    and src_path not in self.assets:
                     dest_path = op.join(self.static_dir,
                                         filename.replace('.scss', '.css'))
                     self.assets[src_path] = dest_path

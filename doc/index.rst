@@ -20,6 +20,8 @@ It is far from perfect or complete. Current features are the following:
   (only if ``app.testing`` or ``app.debug`` are True)
 - Configuration variables can be either set on the app config or given as an 
   option
+- Graceful handling of partials
+- Compatible with any scss framework (like Compass)
 
 Scss files compilation is done by the 
 `pyScss <http://pypi.python.org/pypi/pyScss>`_ implementation by 

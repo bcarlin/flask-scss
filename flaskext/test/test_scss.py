@@ -160,7 +160,7 @@ class ScssTest(unittest.TestCase):
         self.assertIn(op.join(self.asset_dir, 'foo.scss'), scss.assets)
         self.assertNotIn(op.join(self.asset_dir, 'foo.txt'), scss.assets)
 
-    def test_discover_scss_is_recursive(self):
+    def test_scss_discovery_is_recursive(self):
         self.set_layout()
         self.create_asset_file('foo.scss')
         static_scss_dir = op.join(self.test_data, 'assets', 'bar')
@@ -170,6 +170,13 @@ class ScssTest(unittest.TestCase):
         scss.discover_scss()
         self.assertIn(op.join(self.test_data, 'assets', 'bar', 'baz.scss'),
                       scss.assets)
+
+    def test_partial_scss_are_not_considered_assets(self):
+        self.set_layout()
+        self.create_asset_file('_bar.scss')
+        scss = flaskext.flask_scss.Scss(self.app)
+        scss.discover_scss()
+        self.assertNotIn(op.join(self.asset_dir, '_bar.scss'), scss.assets)
 
     def test_update_scss_asset_to_update(self):
         self.set_layout()
