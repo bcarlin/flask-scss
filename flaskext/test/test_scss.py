@@ -178,6 +178,13 @@ class ScssTest(unittest.TestCase):
         scss.discover_scss()
         self.assertNotIn(op.join(self.asset_dir, '_bar.scss'), scss.assets)
 
+    def test_partial_scss_are_considered_partials(self):
+        self.set_layout()
+        self.create_asset_file('_bar.scss')
+        scss = flaskext.flask_scss.Scss(self.app)
+        scss.discover_scss()
+        self.assertIn(op.join(self.asset_dir, '_bar.scss'), scss.partials)
+
     def test_asset_tree_is_kept_in_static_dir(self):
         self.set_layout()
         asset_scss_dir = op.join(self.test_data, 'assets', 'bar')
@@ -222,6 +229,7 @@ class ScssTest(unittest.TestCase):
         css_content = open(css_path).read()
         self.assertEquals(css_content, "nothing")
 
+    # might not be pertinent
     def test_update_scss_update_only_changed_scss_files(self):
         self.set_layout()
         css_must_be_compiled_path = self.create_static_file('foo.css')
@@ -253,6 +261,43 @@ class ScssTest(unittest.TestCase):
 
         css_older_content = open(css_must_not_change_path).read()
         self.assertEquals(css_older_content, "nothing")
+
+        css_newer_content = open(css_must_be_compiled_path).read()
+        self.assertNotEquals(css_newer_content, "nothing")
+
+    def test_css_is_refreshed_if_partials_are_updated(self):
+        self.set_layout()
+        css_must_be_compiled_path = self.create_static_file('foo.css')
+        scss_path = self.create_asset_file('foo.scss')
+        scss_partial_path = self.create_asset_file('_bar.scss')
+
+        scss = flaskext.flask_scss.Scss(self.app)
+
+        os.utime(scss_partial_path,
+                 (time.time() - 25, time.time() - 25))
+
+        scss.discover_scss()
+
+        os.utime(scss_partial_path,
+                 (time.time() - 5, time.time() - 5))
+        os.utime(scss_path,
+                 (time.time() - 15, time.time() - 15))
+        os.utime(css_must_be_compiled_path,
+                 (time.time() - 10, time.time() - 10))
+
+        self.assertGreater(op.getmtime(css_must_be_compiled_path),
+                           op.getmtime(scss_path))
+
+        self.assertGreater(op.getmtime(scss_partial_path),
+                           op.getmtime(css_must_be_compiled_path))
+
+        scss.update_scss()
+
+        self.assertGreater(op.getmtime(css_must_be_compiled_path),
+                           op.getmtime(scss_path))
+
+        self.assertGreater(op.getmtime(css_must_be_compiled_path),
+                           op.getmtime(scss_partial_path), "not refreshed")
 
         css_newer_content = open(css_must_be_compiled_path).read()
         self.assertNotEquals(css_newer_content, "nothing")

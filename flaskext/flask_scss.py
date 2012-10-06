@@ -36,6 +36,7 @@ class Scss(object):
         self.asset_dir = self.set_asset_dir(asset_dir)
         self.static_dir = self.set_static_dir(static_dir)
         self.assets = {}
+        self.partials = {}
 
         if hasattr(scss.LOAD_PATHS, 'split'):
             scss.LOAD_PATHS = scss.LOAD_PATHS.split(',')
@@ -86,16 +87,31 @@ class Scss(object):
         for folder, _, files in os.walk(self.asset_dir):
             for filename in fnmatch.filter(files, '*.scss'):
                 src_path = op.join(folder, filename)
-                if not filename.startswith('_') \
-                    and src_path not in self.assets:
+                if filename.startswith('_') and src_path not in self.partials:
+                    self.partials[src_path] = op.getmtime(src_path)
+                elif src_path not in self.assets:
                     dest_path = src_path.replace(
                                     self.asset_dir,
                                     self.static_dir
                                 ).replace('.scss', '.css')
                     self.assets[src_path] = dest_path
 
+    def partials_have_changed(self):
+        res = False
+        for partial, old_mtime in self.partials.items():
+            cur_mtime = op.getmtime(partial)
+            print partial, cur_mtime, '>', old_mtime
+            if cur_mtime > old_mtime:
+                res = True
+                self.partials[partial] = cur_mtime
+        return res
+
     def update_scss(self):
         self.discover_scss()
+        if self.partials_have_changed():
+            for asset, dest_path in self.assets.items():
+                self.compile_scss(asset, dest_path)
+            return
         for asset, dest_path in self.assets.items():
             dest_mtime = op.getmtime(dest_path) \
                              if op.exists(dest_path) \
