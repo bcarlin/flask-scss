@@ -88,8 +88,10 @@ class Scss(object):
                 src_path = op.join(folder, filename)
                 if not filename.startswith('_') \
                     and src_path not in self.assets:
-                    dest_path = op.join(self.static_dir,
-                                        filename.replace('.scss', '.css'))
+                    dest_path = src_path.replace(
+                                    self.asset_dir,
+                                    self.static_dir
+                                ).replace('.scss', '.css')
                     self.assets[src_path] = dest_path
 
     def update_scss(self):
@@ -104,6 +106,8 @@ class Scss(object):
     def compile_scss(self, asset, dest_path):
         self.app.logger.info("[flask-pyscss] refreshing %s" \
                                 % (dest_path,))
+        if not os.path.exists(op.dirname(dest_path)):
+            os.makedirs(op.dirname(dest_path))
         with open(dest_path, 'w') as fo:
             with open(asset) as fi:
                 fo.write(self.compiler(fi.read()))

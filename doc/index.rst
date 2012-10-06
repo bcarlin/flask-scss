@@ -22,6 +22,8 @@ It is far from perfect or complete. Current features are the following:
   option
 - Graceful handling of partials
 - Compatible with any scss framework (like Compass)
+- Asset tree is kept when it is converted to css (e.g: {assets}/foo/bar.scss
+  will be compiled in {static}/foo/bar.css)
 
 Scss files compilation is done by the 
 `pyScss <http://pypi.python.org/pypi/pyScss>`_ implementation by 
@@ -154,7 +156,7 @@ the following rules:
    2. ``{app.config['SCSS_STATIC_DIR']}`` if this folder exists
 
 3. If ``asset_dir`` option is NOT given to the class Scss and 
-   ``app.config['SCSS_ASSET_DIR']`` is not set, Flask-Scss will
+   ``app.config['SCSS_STATIC_DIR']`` is not set, Flask-Scss will
    build a "default" path from ``app.root_path`` and ``app.static_path``
    (``app`` is your Flask based application). following paths will then be
    tried:

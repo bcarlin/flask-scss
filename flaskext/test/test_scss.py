@@ -163,8 +163,8 @@ class ScssTest(unittest.TestCase):
     def test_scss_discovery_is_recursive(self):
         self.set_layout()
         self.create_asset_file('foo.scss')
-        static_scss_dir = op.join(self.test_data, 'assets', 'bar')
-        os.makedirs(static_scss_dir)
+        asset_scss_dir = op.join(self.test_data, 'assets', 'bar')
+        os.makedirs(asset_scss_dir)
         self.create_asset_file('bar/baz.scss')
         scss = flaskext.flask_scss.Scss(self.app)
         scss.discover_scss()
@@ -177,6 +177,18 @@ class ScssTest(unittest.TestCase):
         scss = flaskext.flask_scss.Scss(self.app)
         scss.discover_scss()
         self.assertNotIn(op.join(self.asset_dir, '_bar.scss'), scss.assets)
+
+    def test_asset_tree_is_kept_in_static_dir(self):
+        self.set_layout()
+        asset_scss_dir = op.join(self.test_data, 'assets', 'bar')
+        os.makedirs(asset_scss_dir)
+        self.create_asset_file('bar/baz.scss')
+        scss = flaskext.flask_scss.Scss(self.app)
+        scss.discover_scss()
+        asset = op.join(self.test_data, 'assets', 'bar', 'baz.scss')
+        expected_dest = op.join(self.test_data, 'static', 'bar', 'baz.css')
+        self.assertEqual(expected_dest, scss.assets[asset],
+                         "css folder not kept")
 
     def test_update_scss_asset_to_update(self):
         self.set_layout()
@@ -299,6 +311,21 @@ class ScssTest(unittest.TestCase):
     def test_the_asset_dir_is_in_the_load_path(self):
         inst = flaskext.flask_scss.Scss(self.app, load_paths=['bar', 'baz'])
         self.assertIn(inst.asset_dir, flaskext.flask_scss.scss.LOAD_PATHS)
+
+    def test_compile_scss_creates_subfolders_if_necessary(self):
+        self.set_layout()
+        asset_scss_dir = op.join(self.test_data, 'assets', 'bar')
+        os.makedirs(asset_scss_dir)
+        self.create_asset_file('bar/baz.scss')
+        self.create_asset_file('foo.scss')
+        op.join(self.test_data, 'assets', 'bar', 'baz.scss')
+        expected_dest = op.join(self.test_data, 'static', 'bar', 'baz.css')
+
+        scss = flaskext.flask_scss.Scss(self.app)
+        scss.update_scss()
+        self.assertTrue(os.path.exists(expected_dest))
+        self.assertTrue(os.path.exists(os.path.join(self.test_data, 'static',
+                                                    'foo.css')))
 
 
 if __name__ == "__main__":
