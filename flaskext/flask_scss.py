@@ -2,6 +2,7 @@ from __future__ import with_statement
 import os.path as op
 import os
 import scss
+import fnmatch
 
 
 class Scss(object):
@@ -43,6 +44,7 @@ class Scss(object):
         for path in load_path_list:
             scss.LOAD_PATHS.append(path)
 
+        scss.log = app.logger
         self.compiler = scss.Scss().compile
 
         if self.app.testing or self.app.debug:
@@ -81,27 +83,26 @@ class Scss(object):
         self.app.before_request(self.update_scss)
 
     def discover_scss(self):
-        for filename in (f for f in os.listdir(self.asset_dir)
-                         if f.endswith('.scss')):
-            if filename not in self.assets:
-                src_path = op.join(self.asset_dir, filename)
-                dest_path = op.join(self.static_dir,
-                                    filename.replace('.scss', '.css'))
-                self.assets[filename] = {'src_path': src_path,
-                                         'dest_path': dest_path}
+        for folder, _, files in os.walk(self.asset_dir):
+            for filename in fnmatch.filter(files, '*.scss'):
+                src_path = op.join(folder, filename)
+                if filename not in self.assets:
+                    dest_path = op.join(self.static_dir,
+                                        filename.replace('.scss', '.css'))
+                    self.assets[src_path] = dest_path
 
     def update_scss(self):
         self.discover_scss()
-        for asset in self.assets.values():
-            dest_mtime = op.getmtime(asset['dest_path']) \
-                             if op.exists(asset['dest_path']) \
+        for asset, dest_path in self.assets.items():
+            dest_mtime = op.getmtime(dest_path) \
+                             if op.exists(dest_path) \
                              else -1
-            if op.getmtime(asset['src_path']) > dest_mtime:
-                self.compile_scss(asset)
+            if op.getmtime(asset) > dest_mtime:
+                self.compile_scss(asset, dest_path)
 
-    def compile_scss(self, asset):
+    def compile_scss(self, asset, dest_path):
         self.app.logger.info("[flask-pyscss] refreshing %s" \
-                                % (asset['dest_path'],))
-        with open(asset['dest_path'], 'w') as fo:
-            with open(asset['src_path']) as fi:
+                                % (dest_path,))
+        with open(dest_path, 'w') as fo:
+            with open(asset) as fi:
                 fo.write(self.compiler(fi.read()))

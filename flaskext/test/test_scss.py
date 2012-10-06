@@ -28,7 +28,7 @@ class ScssTest(unittest.TestCase):
         shutil.rmtree(self.test_data, ignore_errors=True)
 
     def set_layout(self, base=None):
-        base = base if base is not None else self.test_data
+        base = base or self.test_data
         self.static_dir = op.join(base, 'static')
         os.makedirs(self.static_dir)
         self.asset_dir = op.join(base, 'assets')
@@ -48,7 +48,8 @@ class ScssTest(unittest.TestCase):
 
     def test_that_required_flask_app_attributes_exist(self):
         flask_app = Flask('__main__')
-        for attr in ['static_folder', 'root_path', 'logger', 'before_request']:
+        for attr in ['static_folder', 'root_path', 'logger', 'before_request',
+                     'testing', 'debug']:
             assert hasattr(flask_app, attr)
 
     def test_set_asset_dir_assets_scss(self):
@@ -156,8 +157,19 @@ class ScssTest(unittest.TestCase):
         self.create_asset_file('foo.txt')
         scss = flaskext.flask_scss.Scss(self.app)
         scss.discover_scss()
-        self.assertIn('foo.scss', scss.assets)
-        self.assertNotIn('foo.txt', scss.assets)
+        self.assertIn(op.join(self.asset_dir, 'foo.scss'), scss.assets)
+        self.assertNotIn(op.join(self.asset_dir, 'foo.txt'), scss.assets)
+
+    def test_discover_scss_is_recursive(self):
+        self.set_layout()
+        self.create_asset_file('foo.scss')
+        static_scss_dir = op.join(self.test_data, 'assets', 'bar')
+        os.makedirs(static_scss_dir)
+        self.create_asset_file('bar/baz.scss')
+        scss = flaskext.flask_scss.Scss(self.app)
+        scss.discover_scss()
+        self.assertIn(op.join(self.test_data, 'assets', 'bar', 'baz.scss'),
+                      scss.assets)
 
     def test_update_scss_asset_to_update(self):
         self.set_layout()
