@@ -33,11 +33,11 @@ It is far from perfect or complete. Current features are the following:
 - Automatic refreshing of resulting .css files when .scss sources have changed
   (only if ``app.testing`` or ``app.debug`` are True)
 - Configuration variables can be either set on the app config or given as an 
-  option
+  option (it makes it easier to have different dev/test/prod settings)
 - Graceful handling of partials
 - Compatible with any scss framework (like Compass)
-- Asset tree is kept when it is converted to css (e.g: {assets}/foo/bar.scss
-  will be compiled in {static}/foo/bar.css)
+- Asset tree is kept when it is converted to css 
+  (e.g: ``{assets}/foo/bar.scss`` will be compiled in ``{static}/foo/bar.css``)
 
 Scss files compilation is done by the 
 `pyScss <http://pypi.python.org/pypi/pyScss>`_ implementation by 
@@ -72,6 +72,11 @@ configuring the application::
   
   app = Flask(__name__)
   Scss(app)
+
+.. warning::
+   The import method has changed with Flask 0.8.
+   If you used a previous version, please update your imports of Flask-Scss.
+   The "old way will still work, but it is deprecated!
 
 Flask-Scss will determine if it must refresh css files before each request by
 looking at your application configuration. If ``app.testing`` or ``app.debug``
@@ -208,6 +213,32 @@ APIs
 
 Changes
 -------
+
+0.2 (2012/10/07)
+~~~~~~~~~~~~~~~~
+* Main enhancements and bugfixes:
+
+  * New import scheme conforiming to Flask-0.8 ``flask.ext.*`` . 
+    **The change is backward-compatible** (although deprecated!)
+  * Asset tree is preserved during compilation to css
+  * Asset dir is searched recursively (as it was expected!)
+  * Do not compile scss files starting with an "_" anymore (they are considered 
+    as partials)
+  * Recompilation of all CSS files if a partial has been modified
+  * Scss can be configured in app.config (it allows for different 
+    dev/test/prod settings)
+  * pyScss scss files search path can be configured by passing it to Scss() 
+    or by adding an option to the app config
+  * Looks for app.debug or app.testing to decide if it must automatically 
+    refresh css before each requests or not
+
+* Other internal changes:
+
+  * migration to git and Github
+  * Updates a lot of things to make the packages follow standard guidelines
+  * Adds setup.cfg to automate doc build and upload
+  * Moves tests out of the main package
+
 
 0.1 (2011/07/08)
 ~~~~~~~~~~~~~~~~
