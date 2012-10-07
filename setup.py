@@ -16,7 +16,7 @@ Links
 .. _pyScss: http://pypi.python.org/pypi/pyScss
 
 """
-from distutils.core import setup
+from setuptools import setup
 
 
 setup(
