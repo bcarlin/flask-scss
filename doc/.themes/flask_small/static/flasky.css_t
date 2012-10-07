@@ -226,6 +226,7 @@ table.field-list, table.footnote {
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     box-shadow: none;
+    margin: 50px 20px;
 }
 
 table.footnote {

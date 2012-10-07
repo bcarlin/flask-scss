@@ -7,7 +7,21 @@ Welcome to Flask-Scss's documentation!
 ======================================
 
 
+
+:Author:   `Bruno Carlin <http://bcarlin.net>`__
+:Version:  |version|
+:Date:     |today|
+:Homepage: `Flask-Scss Homepage <http://packages.python.org/Flask-Scss>`__
+:Download:  `Flask-Scss on PyPI <http://pypi.python.org/pypi/Flask-Scss>`__
+:License:    MIT License
+:Source code:  `Github project <https://github.com/bcarlin/flask-scss>`__
+:Issue tracker:  `Github project <https://github.com/bcarlin/flask-scss>`__
+
+
+
 .. contents::
+
+
 
 
 This extension brings Scss support to Flask apps.
