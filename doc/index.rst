@@ -205,3 +205,11 @@ APIs
 
 .. autoclass:: flaskext.flask_scss.Scss
 
+
+Changes
+-------
+
+0.1 (2011/07/08)
+~~~~~~~~~~~~~~~~
+
+* Initial release
