@@ -11,7 +11,7 @@ Links
 
 * `documentation <http://packages.python.org/Flask-Scss>`_
 * `development version
-  <https://bitbucket.org/aerdhyl/flask-scss#egg=Flask-Scss-dev>`_
+  <https://github.com/bcarlin/flask-scss#egg=Flask-Scss-dev>`_
 
 .. _pyScss: http://pypi.python.org/pypi/pyScss
 
@@ -25,7 +25,7 @@ setup(
     url='https://github.com/bcarlin/flask-scss',
     license='MIT',
     author='Bruno Carlin',
-    author_email='self@aerdhyl.eu',
+    author_email='bruno@bcarlin.net',
     description='Adds support for scss files to Flask applications',
     long_description=__doc__,
     packages=['flaskext', 'flaskext.test'],
