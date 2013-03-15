@@ -32,16 +32,16 @@ It is far from perfect or complete. Current features are the following:
 - Automatic compilation of .scss files
 - Automatic refreshing of resulting .css files when .scss sources have changed
   (only if ``app.testing`` or ``app.debug`` are True)
-- Configuration variables can be either set on the app config or given as an 
+- Configuration variables can be either set on the app config or given as an
   option (it makes it easier to have different dev/test/prod settings)
 - Graceful handling of partials
 - Compatible with any scss framework (like Compass)
-- Asset tree is kept when it is converted to css 
+- Asset tree is kept when it is converted to css
   (e.g: ``{assets}/foo/bar.scss`` will be compiled in ``{static}/foo/bar.css``)
 
-Scss files compilation is done by the 
-`pyScss <http://pypi.python.org/pypi/pyScss>`_ implementation by 
-German M. Bravo (Kronuz). Refer to this package documentation to see the 
+Scss files compilation is done by the
+`pyScss <http://pypi.python.org/pypi/pyScss>`_ implementation by
+German M. Bravo (Kronuz). Refer to this package documentation to see the
 supported scss syntax.
 
 
@@ -64,12 +64,12 @@ or using ``pip``::
 Configuration
 -------------
 
-To get started all you need to do is to instanciate a Scss object after 
+To get started all you need to do is to instanciate a Scss object after
 configuring the application::
 
   from flask import Flask
   from flask.ext.scss import Scss
-  
+
   app = Flask(__name__)
   Scss(app)
 
@@ -80,14 +80,14 @@ configuring the application::
 
 Flask-Scss will determine if it must refresh css files before each request by
 looking at your application configuration. If ``app.testing`` or ``app.debug``
-are True, it will refresh the .css file if the matching .scss file has been 
+are True, it will refresh the .css file if the matching .scss file has been
 modified.
 
-You will then have to generate css files yourself for other setups 
+You will then have to generate css files yourself for other setups
 (WSGI server, etc...)
 
-For each .scss file found in the "asset" directory, a corresponding .css file 
-will be created. 
+For each .scss file found in the "asset" directory, a corresponding .css file
+will be created.
 
 The class ``Scss`` can take two additionnal optionnal parameters:
 
@@ -95,7 +95,7 @@ The class ``Scss`` can take two additionnal optionnal parameters:
 - ``static_dir``: specifies the directory where to put generated ``.css`` files
 
 For example, calling::
-  
+
   Scss(app, static_dir='static', asset_dir='assets')
 
 will expect the following layout::
@@ -127,7 +127,7 @@ application configuration (app.config).
 
 
 
-.. _scss_discovery_rules: 
+.. _scss_discovery_rules:
 
 ``.scss`` files discovery rules
 -------------------------------
@@ -145,7 +145,7 @@ The ``asset`` directory will be selecting according to the following rules:
    1. ``{app.config['SCSS_ASSET_DIR']}/scss`` if this folder exists
    2. ``{app.config['SCSS_ASSET_DIR']}`` if this folder exists
 
-3. If ``asset_dir`` option is NOT given to the class Scss and 
+3. If ``asset_dir`` option is NOT given to the class Scss and
    ``app.config['SCSS_ASSET_DIR']`` is not set:
 
    1. ``{app.root_dir}/assets/scss`` if this folder exists
@@ -154,14 +154,14 @@ The ``asset`` directory will be selecting according to the following rules:
 If no asset directory is found, Flask-Scss will not be activated.
 
 
-.. _static_discovery_rules: 
+.. _static_discovery_rules:
 
 ``static`` directory discovery rules
 ------------------------------------
 
 
-Flask-Scss will put the ``.css`` files it generates in your ``static`` 
-directory. The ``static`` directory will be resolved according to 
+Flask-Scss will put the ``.css`` files it generates in your ``static``
+directory. The ``static`` directory will be resolved according to
 the following rules:
 
 1. If ``static_dir`` option is given to the class Scss:
@@ -174,7 +174,7 @@ the following rules:
    1. ``{app.config['SCSS_STATIC_DIR']}/css`` if this folder exists
    2. ``{app.config['SCSS_STATIC_DIR']}`` if this folder exists
 
-3. If ``asset_dir`` option is NOT given to the class Scss and 
+3. If ``asset_dir`` option is NOT given to the class Scss and
    ``app.config['SCSS_STATIC_DIR']`` is not set, Flask-Scss will
    build a "default" path from ``app.root_path`` and ``app.static_path``
    (``app`` is your Flask based application). following paths will then be
@@ -193,7 +193,7 @@ Scss frameworks like Compass heavily use ``@import`` directives.
 
 You can specify the search path for such libraries by passing an extra argument
 to :class:`Scss` ::
-  
+
   Scss(app, load_paths=[
     '/Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/'
   ])
@@ -214,22 +214,28 @@ APIs
 Changes
 -------
 
+0.3 (2013/03/15)
+~~~~~~~~~~~~~~~~
+
+* Changes to stay compatible with pyScss 1.1.5
+* Changes in pyScss broke support for python 2.5. it is suspended for now.
+
 0.2 (2012/10/07)
 ~~~~~~~~~~~~~~~~
 * Main enhancements and bugfixes:
 
-  * New import scheme conforiming to Flask-0.8 ``flask.ext.*`` . 
+  * New import scheme conforiming to Flask-0.8 ``flask.ext.*`` .
     **The change is backward-compatible** (although deprecated!)
   * Asset tree is preserved during compilation to css
   * Asset dir is searched recursively (as it was expected!)
-  * Do not compile scss files starting with an "_" anymore (they are considered 
+  * Do not compile scss files starting with an "_" anymore (they are considered
     as partials)
   * Recompilation of all CSS files if a partial has been modified
-  * Scss can be configured in app.config (it allows for different 
+  * Scss can be configured in app.config (it allows for different
     dev/test/prod settings)
-  * pyScss scss files search path can be configured by passing it to Scss() 
+  * pyScss scss files search path can be configured by passing it to Scss()
     or by adding an option to the app config
-  * Looks for app.debug or app.testing to decide if it must automatically 
+  * Looks for app.debug or app.testing to decide if it must automatically
     refresh css before each requests or not
 
 * Other internal changes:
