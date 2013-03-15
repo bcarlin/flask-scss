@@ -331,29 +331,29 @@ class ScssTest(unittest.TestCase):
     def test_it_looks_for_an_app_load_path_settings(self):
         self.app.config['SCSS_LOAD_PATHS'].append('foo')
         scss.Scss(self.app)
-        self.assertIn('foo', scss.pyScss.LOAD_PATHS)
+        self.assertIn('foo', scss.pyScss.config.LOAD_PATHS)
 
     def test_it_looks_for_an_app_load_path_settings_with_multiple_paths(self):
         self.app.config['SCSS_LOAD_PATHS'].append('foo')
         self.app.config['SCSS_LOAD_PATHS'].append('bar')
         scss.Scss(self.app)
-        self.assertIn('foo', scss.pyScss.LOAD_PATHS)
-        self.assertIn('bar', scss.pyScss.LOAD_PATHS)
+        self.assertIn('foo', scss.pyScss.config.LOAD_PATHS)
+        self.assertIn('bar', scss.pyScss.config.LOAD_PATHS)
 
     def test_app_config_is_overridden_by_local_conf(self):
         self.app.config['SCSS_LOAD_PATHS'].append('foo')
         scss.Scss(self.app, load_paths=['bar'])
-        self.assertIn('bar', scss.pyScss.LOAD_PATHS)
+        self.assertIn('bar', scss.pyScss.config.LOAD_PATHS)
 
     def test_app_config_is_overridden_by_local_conf_with_multiple_paths(self):
         self.app.config['SCSS_LOAD_PATHS'].append('foo')
         scss.Scss(self.app, load_paths=['bar', 'baz'])
-        self.assertIn('bar', scss.pyScss.LOAD_PATHS)
-        self.assertIn('baz', scss.pyScss.LOAD_PATHS)
+        self.assertIn('bar', scss.pyScss.config.LOAD_PATHS)
+        self.assertIn('baz', scss.pyScss.config.LOAD_PATHS)
 
     def test_the_asset_dir_is_in_the_load_path(self):
         inst = scss.Scss(self.app, load_paths=['bar', 'baz'])
-        self.assertIn(inst.asset_dir, scss.pyScss.LOAD_PATHS)
+        self.assertIn(inst.asset_dir, scss.pyScss.config.LOAD_PATHS)
 
     def test_compile_scss_creates_subfolders_if_necessary(self):
         self.set_layout()

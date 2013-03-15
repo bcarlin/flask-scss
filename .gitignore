@@ -1,4 +1,3 @@
-syntax: glob
 .project
 .pydevproject
 *.pyc
@@ -10,3 +9,5 @@ flake8.txt
 doc/.themes/.git
 MANIFEST
 dist
+.coverage
+htmlcov/
