@@ -39,12 +39,12 @@ class Scss(object):
         self.assets = {}
         self.partials = {}
 
-        if hasattr(pyScss.LOAD_PATHS, 'split'):
-            pyScss.LOAD_PATHS = pyScss.LOAD_PATHS.split(',')
+        if hasattr(pyScss.config.LOAD_PATHS, 'split'):
+            pyScss.config.LOAD_PATHS = pyScss.config.LOAD_PATHS.split(',')
         load_path_list = [self.asset_dir] \
                        + (load_paths or app.config.get('SCSS_LOAD_PATHS', []))
         for path in load_path_list:
-            pyScss.LOAD_PATHS.append(path)
+            pyScss.config.LOAD_PATHS.append(path)
 
         pyScss.log = app.logger
         self.compiler = pyScss.Scss().compile
