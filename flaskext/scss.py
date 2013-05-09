@@ -14,7 +14,7 @@ class Scss(object):
     Any application that wants to use Flask-Scss must create a instance of this class
     '''
 
-    def __init__(self, app, static_dir=None, asset_dir=None, load_paths=[]):
+    def __init__(self, app, static_dir=None, asset_dir=None, load_paths=None):
         '''
 
         See :ref:`scss_discovery_rules`
@@ -33,6 +33,9 @@ class Scss(object):
         :param load_paths: A list of folders to add to pyScss load_paths
                            (for ex., the path to a library like Compass)
         '''
+        if not load_paths:
+            load_paths = []
+            
         self.app = app
         self.asset_dir = self.set_asset_dir(asset_dir)
         self.static_dir = self.set_static_dir(static_dir)
@@ -90,7 +93,7 @@ class Scss(object):
                 src_path = op.join(folder, filename)
                 if filename.startswith('_') and src_path not in self.partials:
                     self.partials[src_path] = op.getmtime(src_path)
-                elif src_path not in self.assets:
+                elif src_path not in self.partials and src_path not in self.assets:
                     dest_path = src_path.replace(
                                     self.asset_dir,
                                     self.static_dir
