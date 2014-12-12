@@ -123,8 +123,7 @@ class Scss(object):
                 self.compile_scss(asset, dest_path)
 
     def compile_scss(self, asset, dest_path):
-        self.app.logger.info("[flask-pyscss] refreshing %s" \
-                                % (dest_path,))
+        self.app.logger.info("[flask-pyscss] refreshing %s" % (dest_path,))
         if not os.path.exists(op.dirname(dest_path)):
             os.makedirs(op.dirname(dest_path))
         with open(dest_path, 'w') as fo:
