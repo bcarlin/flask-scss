@@ -27,9 +27,9 @@ class Scss(object):
 
         :param app: Your Flask Application
         :param static_dir: The path to the ``static`` directory of your
-                           application (optionnal)
+                           application (optional)
         :param asset_dir: The path to the ``assets`` directory where Flask-Scss
-                          will search ``.scss`` files (optionnal)
+                          will search ``.scss`` files (optional)
         :param load_paths: A list of folders to add to pyScss load_paths
                            (for ex., the path to a library like Compass)
         '''
