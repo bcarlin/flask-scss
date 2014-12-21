@@ -27,9 +27,9 @@ class Scss(object):
 
         :param app: Your Flask Application
         :param static_dir: The path to the ``static`` directory of your
-                           application (optionnal)
+                           application (optional)
         :param asset_dir: The path to the ``assets`` directory where Flask-Scss
-                          will search ``.scss`` files (optionnal)
+                          will search ``.scss`` files (optional)
         :param load_paths: A list of folders to add to pyScss load_paths
                            (for ex., the path to a library like Compass)
         '''
@@ -123,8 +123,7 @@ class Scss(object):
                 self.compile_scss(asset, dest_path)
 
     def compile_scss(self, asset, dest_path):
-        self.app.logger.info("[flask-pyscss] refreshing %s" \
-                                % (dest_path,))
+        self.app.logger.info("[flask-pyscss] refreshing %s" % (dest_path,))
         if not os.path.exists(op.dirname(dest_path)):
             os.makedirs(op.dirname(dest_path))
         with open(dest_path, 'w') as fo:
