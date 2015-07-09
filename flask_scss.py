@@ -35,7 +35,7 @@ class Scss(object):
         '''
         if not load_paths:
             load_paths = []
-            
+
         self.app = app
         self.asset_dir = self.set_asset_dir(asset_dir)
         self.static_dir = self.set_static_dir(static_dir)

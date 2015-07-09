@@ -15,8 +15,7 @@ setup(
     author_email='bruno@bcarlin.net',
     description='Adds support for scss files to Flask applications',
     long_description=LONG_DOC,
-    packages=['flaskext'],
-    namespace_packages=['flaskext'],
+    py_modules=['flask_scss'],
     zip_safe=False,
     platforms='any',
     install_requires=[
