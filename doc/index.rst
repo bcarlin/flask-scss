@@ -214,10 +214,18 @@ APIs
 Changes
 -------
 
+0.4 (2015/07/09)
+~~~~~~~~~~~~~~~~
+
+* Fixed partial compilation bug (Vail Gold)
+* Fix spelling error in docstring (Tobias Widén)
+* comply with Flask import schem (`http://flask.pocoo.org/docs/0.10/extensiondev/`_)
+
+
 0.3 (2013/03/15)
 ~~~~~~~~~~~~~~~~
 
-* Changes to stay compatible with pyScss 1.1.5
+* Changes to stay compatible with pyScss 1.1.5 (James Ouyang)
 * Changes in pyScss broke support for python 2.5. it is suspended for now.
 
 0.2 (2012/10/07)
