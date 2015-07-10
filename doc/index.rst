@@ -214,7 +214,14 @@ APIs
 Changes
 -------
 
-0.4 (2015/07/09)
+0.5 (2015/07/10)
+~~~~~~~~~~~~~~~~
+
+* Fixes setup.py (`#15 <https://github.com/bcarlin/flask-scss/issues/15>`_)
+
+
+
+0.4 (2015/07/10)
 ~~~~~~~~~~~~~~~~
 
 * Compatibility with python 3.3+
