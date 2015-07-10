@@ -217,9 +217,11 @@ Changes
 0.4 (2015/07/09)
 ~~~~~~~~~~~~~~~~
 
+* Compatibility with python 3.3+
 * Fixed partial compilation bug (Vail Gold)
 * Fix spelling error in docstring (Tobias Widén)
-* comply with Flask import schem (`http://flask.pocoo.org/docs/0.10/extensiondev/`_)
+* comply with Flask import scheme (`http://flask.pocoo.org/docs/0.10/extensiondev/`_)
+* Makes flask scss work with pyScss new API
 
 
 0.3 (2013/03/15)

@@ -2,7 +2,7 @@ from __future__ import with_statement
 from __future__ import absolute_import
 import os.path as op
 import os
-import scss as pyScss
+from scss.compiler import Compiler
 import fnmatch
 
 
@@ -42,16 +42,11 @@ class Scss(object):
         self.assets = {}
         self.partials = {}
 
-        if hasattr(pyScss.config.LOAD_PATHS, 'split'):
-            pyScss.config.LOAD_PATHS = pyScss.config.LOAD_PATHS.split(',')
-        load_path_list = [self.asset_dir] \
+        load_path_list = ([self.asset_dir] if self.asset_dir else []) \
                        + (load_paths or app.config.get('SCSS_LOAD_PATHS', []))
-        for path in load_path_list:
-            pyScss.config.LOAD_PATHS.append(path)
 
-        pyScss.log = app.logger
-        self.compiler = pyScss.Scss().compile
-
+        # pyScss.log = app.logger
+        self.compiler = Compiler(search_path=load_path_list)
         if self.app.testing or self.app.debug:
             self.set_hooks()
 
@@ -126,6 +121,6 @@ class Scss(object):
         self.app.logger.info("[flask-pyscss] refreshing %s" % (dest_path,))
         if not os.path.exists(op.dirname(dest_path)):
             os.makedirs(op.dirname(dest_path))
-        with open(dest_path, 'w') as fo:
-            with open(asset) as fi:
-                fo.write(self.compiler(fi.read()))
+        with open(dest_path, 'w') as file_out:
+            with open(asset) as file_in:
+                file_out.write(self.compiler.compile_string(file_in.read()))

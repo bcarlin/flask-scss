@@ -6,10 +6,14 @@ except ImportError:
 import os
 import os.path as op
 import shutil
-from mock import Mock, patch
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
 from flask import Flask
 import flask_scss
 import time
+import pathlib
 
 SCSS_CONTENT = "a { color: red; text-decoration: none; }"
 
@@ -36,6 +40,8 @@ class ScssTest(unittest.TestCase):
 
     def create_asset_file(self, filename):
         filepath = op.join(self.asset_dir, filename)
+        if not os.path.exists(os.path.dirname(filepath)):
+            os.makedirs(os.path.dirname(filepath))
         with open(filepath, 'w') as f:
             f.write(SCSS_CONTENT)
         return filepath
@@ -162,7 +168,6 @@ class ScssTest(unittest.TestCase):
         self.set_layout()
         self.create_asset_file('foo.scss')
         asset_scss_dir = op.join(self.test_data, 'assets', 'bar')
-        os.makedirs(asset_scss_dir)
         self.create_asset_file('bar/baz.scss')
         scss_inst = flask_scss.Scss(self.app)
         scss_inst.discover_scss()
@@ -208,8 +213,9 @@ class ScssTest(unittest.TestCase):
         #verifies that css file has been modified
         self.assertGreater(op.getmtime(css_path), op.getmtime(scss_path))
         # verifies that the content of the css file has changed
-        css_content = open(css_path).read()
-        self.assertNotEquals(css_content, "nothing")
+        with open(css_path) as css_file:
+            css_content = css_file.read()
+        self.assertNotEqual(css_content, "nothing")
 
     def test_update_scss_nothing_to_update(self):
         self.set_layout()
@@ -258,11 +264,13 @@ class ScssTest(unittest.TestCase):
         self.assertGreater(op.getmtime(css_must_be_compiled_path),
                            op.getmtime(scss_newer_path))
 
-        css_older_content = open(css_must_not_change_path).read()
+        with open(css_must_not_change_path) as file_in:
+            css_older_content = file_in.read()
         self.assertEqual(css_older_content, "nothing")
 
-        css_newer_content = open(css_must_be_compiled_path).read()
-        self.assertNotEquals(css_newer_content, "nothing")
+        with open(css_must_be_compiled_path) as file_in:
+            css_newer_content = file_in.read()
+        self.assertNotEqual(css_newer_content, "nothing")
 
     def test_css_is_refreshed_if_partials_are_updated(self):
         self.set_layout()
@@ -298,8 +306,9 @@ class ScssTest(unittest.TestCase):
         self.assertGreater(op.getmtime(css_must_be_compiled_path),
                            op.getmtime(scss_partial_path), "not refreshed")
 
-        css_newer_content = open(css_must_be_compiled_path).read()
-        self.assertNotEquals(css_newer_content, "nothing")
+        with open(css_must_be_compiled_path) as file_in:
+            css_newer_content = file_in.read()
+        self.assertNotEqual(css_newer_content, "nothing")
 
     def test_it_sets_up_refresh_hooks_if_application_is_in_test_mode(self):
         self.app.testing = True
@@ -331,30 +340,38 @@ class ScssTest(unittest.TestCase):
 
     def test_it_looks_for_an_app_load_path_settings(self):
         self.app.config['SCSS_LOAD_PATHS'].append('foo')
-        flask_scss.Scss(self.app)
-        self.assertIn('foo', flask_scss.pyScss.config.LOAD_PATHS)
+        scss = flask_scss.Scss(self.app)
+        self.assertIn(pathlib.Path(os.getcwd(), 'foo'),
+                      scss.compiler.search_path)
 
     def test_it_looks_for_an_app_load_path_settings_with_multiple_paths(self):
-        self.app.config['SCSS_LOAD_PATHS'].append('foo')
-        self.app.config['SCSS_LOAD_PATHS'].append('bar')
-        flask_scss.Scss(self.app)
-        self.assertIn('foo', flask_scss.pyScss.config.LOAD_PATHS)
-        self.assertIn('bar', flask_scss.pyScss.config.LOAD_PATHS)
+        paths = ['foo', 'bar']
+        for path in paths:
+            self.app.config['SCSS_LOAD_PATHS'].append(path)
+        scss = flask_scss.Scss(self.app)
+
+        for path in paths:
+            self.assertIn(pathlib.Path(os.getcwd(), path),
+                          scss.compiler.search_path)
 
     def test_app_config_is_overridden_by_local_conf(self):
         self.app.config['SCSS_LOAD_PATHS'].append('foo')
-        flask_scss.Scss(self.app, load_paths=['bar'])
-        self.assertIn('bar', flask_scss.pyScss.config.LOAD_PATHS)
+        scss = flask_scss.Scss(self.app, load_paths=['bar'])
+        self.assertIn(pathlib.Path(os.getcwd(), 'bar'),
+                      scss.compiler.search_path)
 
     def test_app_config_is_overridden_by_local_conf_with_multiple_paths(self):
         self.app.config['SCSS_LOAD_PATHS'].append('foo')
-        flask_scss.Scss(self.app, load_paths=['bar', 'baz'])
-        self.assertIn('bar', flask_scss.pyScss.config.LOAD_PATHS)
-        self.assertIn('baz', flask_scss.pyScss.config.LOAD_PATHS)
+        scss = flask_scss.Scss(self.app, load_paths=['bar', 'baz'])
+        self.assertIn(pathlib.Path(os.getcwd(), 'bar'),
+                      scss.compiler.search_path)
+        self.assertIn(pathlib.Path(os.getcwd(), 'baz'),
+                      scss.compiler.search_path)
 
     def test_the_asset_dir_is_in_the_load_path(self):
+        self.set_layout()
         inst = flask_scss.Scss(self.app, load_paths=['bar', 'baz'])
-        self.assertIn(inst.asset_dir, flask_scss.pyScss.config.LOAD_PATHS)
+        self.assertIn(pathlib.Path(inst.asset_dir), inst.compiler.search_path)
 
     def test_compile_scss_creates_subfolders_if_necessary(self):
         self.set_layout()
