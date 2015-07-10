@@ -208,7 +208,7 @@ or by setting an option in your app config::
 APIs
 ----
 
-.. autoclass:: flaskext.flask_scss.Scss
+.. autoclass:: flask_scss.Scss
 
 
 Changes
@@ -220,7 +220,7 @@ Changes
 * Compatibility with python 3.3+
 * Fixed partial compilation bug (Vail Gold)
 * Fix spelling error in docstring (Tobias Widén)
-* comply with Flask import scheme (`http://flask.pocoo.org/docs/0.10/extensiondev/`_)
+* Comply with Flask import scheme (`<http://flask.pocoo.org/docs/0.10/extensiondev/>`_)
 * Makes flask scss work with pyScss new API
 
 
