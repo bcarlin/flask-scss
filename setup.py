@@ -8,7 +8,7 @@ with open('README.rst') as readme:
 
 setup(
     name='Flask-Scss',
-    version='0.3',
+    version='0.4',
     url='https://github.com/bcarlin/flask-scss',
     license='MIT',
     author='Bruno Carlin',
