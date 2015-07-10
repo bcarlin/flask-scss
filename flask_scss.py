@@ -4,6 +4,7 @@ import os.path as op
 import os
 from scss.compiler import Compiler
 import fnmatch
+import codecs
 
 
 class Scss(object):
@@ -121,6 +122,6 @@ class Scss(object):
         self.app.logger.info("[flask-pyscss] refreshing %s" % (dest_path,))
         if not os.path.exists(op.dirname(dest_path)):
             os.makedirs(op.dirname(dest_path))
-        with open(dest_path, 'w') as file_out:
+        with codecs.open(dest_path, 'w', 'utf-8') as file_out:
             with open(asset) as file_in:
                 file_out.write(self.compiler.compile_string(file_in.read()))

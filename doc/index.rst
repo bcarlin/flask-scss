@@ -222,6 +222,7 @@ Changes
 * Fix spelling error in docstring (Tobias Widén)
 * Comply with Flask import scheme (`<http://flask.pocoo.org/docs/0.10/extensiondev/>`_)
 * Makes flask scss work with pyScss new API
+* Allow utf-8 output in generated css files (`#14 <https://github.com/bcarlin/flask-scss/issues/14>`_)
 
 
 0.3 (2013/03/15)

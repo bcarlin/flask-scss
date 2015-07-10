@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import with_statement
 try:
     import unittest2 as unittest
@@ -16,6 +17,7 @@ import time
 import pathlib
 
 SCSS_CONTENT = "a { color: red; text-decoration: none; }"
+SCSS_UNICODE_CONTENT = "a { content: \"ビール ሳድስ ๛\";}"
 SCSS_CONTENT_WITH_PARTIAL = "@import \"test\";\na { color: red; text-decoration: none; }"
 TEST_PARTIAL = ".test{color: white;}"
 
@@ -407,6 +409,23 @@ class ScssTest(unittest.TestCase):
         with open(css_path) as css_file:
             css_content = css_file.read()
         self.assertIn(".test", css_content)
+
+    def test_update_scss_with_unicode_content(self):
+        self.set_layout()
+        css_path = self.create_static_file('foo.css')
+        scss_path = self.create_asset_file('foo.scss', content=SCSS_UNICODE_CONTENT)
+        os.utime(css_path, (time.time() - 10, time.time() - 10))
+        os.utime(scss_path, (time.time() - 5, time.time() - 5))
+        scss_inst = flask_scss.Scss(self.app)
+        # check that the css file is older than the scss file
+        self.assertGreater(op.getmtime(scss_path), op.getmtime(css_path))
+        scss_inst.update_scss()
+        #verifies that css file has been modified
+        self.assertGreater(op.getmtime(css_path), op.getmtime(scss_path))
+        # verifies that the content of the css file has changed
+        with open(css_path) as css_file:
+            css_content = css_file.read()
+        self.assertIn("๛", css_content)
 
     def test_import_scheme_new(self):
         try:
