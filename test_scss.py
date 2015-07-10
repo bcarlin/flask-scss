@@ -16,6 +16,8 @@ import time
 import pathlib
 
 SCSS_CONTENT = "a { color: red; text-decoration: none; }"
+SCSS_CONTENT_WITH_PARTIAL = "@import \"test\";\na { color: red; text-decoration: none; }"
+TEST_PARTIAL = ".test{color: white;}"
 
 
 class ScssTest(unittest.TestCase):
@@ -38,12 +40,12 @@ class ScssTest(unittest.TestCase):
         self.asset_dir = op.join(base, 'assets')
         os.makedirs(self.asset_dir)
 
-    def create_asset_file(self, filename):
+    def create_asset_file(self, filename, content=SCSS_CONTENT):
         filepath = op.join(self.asset_dir, filename)
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
         with open(filepath, 'w') as f:
-            f.write(SCSS_CONTENT)
+            f.write(content)
         return filepath
 
     def create_static_file(self, filename):
@@ -387,6 +389,24 @@ class ScssTest(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_dest))
         self.assertTrue(os.path.exists(os.path.join(self.test_data, 'static',
                                                     'foo.css')))
+
+    def test_update_scss_with_partial(self):
+        self.set_layout()
+        css_path = self.create_static_file('foo.css')
+        scss_path = self.create_asset_file('foo.scss', content=SCSS_CONTENT_WITH_PARTIAL)
+        scss_path = self.create_asset_file('_test.scss', content=TEST_PARTIAL)
+        os.utime(css_path, (time.time() - 10, time.time() - 10))
+        os.utime(scss_path, (time.time() - 5, time.time() - 5))
+        scss_inst = flask_scss.Scss(self.app)
+        # check that the css file is older than the scss file
+        self.assertGreater(op.getmtime(scss_path), op.getmtime(css_path))
+        scss_inst.update_scss()
+        #verifies that css file has been modified
+        self.assertGreater(op.getmtime(css_path), op.getmtime(scss_path))
+        # verifies that the content of the css file has changed
+        with open(css_path) as css_file:
+            css_content = css_file.read()
+        self.assertIn(".test", css_content)
 
     def test_import_scheme_new(self):
         try:
